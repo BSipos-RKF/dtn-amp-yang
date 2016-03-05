@@ -1,0 +1,99 @@
+module "example-adm" {
+	namespace "urn:example-adm";
+	prefix "example-adm";
+	
+	import "amp-adm" {
+		prefix "amp";
+	}
+	
+	amp:fulloid "1.3.6.1.2.3.3";
+	
+	amp:nickname "3" {
+		amp:fulloid "1.3.6.1.2";
+	}
+	
+	amp:group "primitives" {
+		amp:suboid "1";
+		description "Primitive data available for getting or setting";
+		
+		amp:dataitem "example" {
+			amp:suboid "1";
+			type "amp:UVAST";
+			description "Example value.";
+		}
+	}
+	
+	amp:group "reports" {
+		amp:suboid 3;
+		
+		amp:report showall {
+			amp:suboid 8;
+			
+			amp:MC-instance {
+				amp:MID-instance {
+//					instance-identifier "/primitives/example";
+				}
+			}
+		}
+	}
+	
+	amp:group "controls" {
+		amp:suboid "4";
+		description "Container for all commands in this ADM.";
+	
+		amp:control "get" {
+			amp:suboid "2";
+			description "Get a single MIB value from the agent.";
+			
+			amp:parameter "corrid" {
+				type "amp:SDNV";
+				description "The correlation identifier for the request.";
+			}
+			amp:parameter "object" {
+				type "amp:MID";
+				description "Identity of the object to retrieve.";
+			}
+			
+			amp:result "corrid" {
+				type "amp:SDNV";
+				description "The correlation identifier for the response.";
+			}
+			amp:result "errorcode" {
+				type "amp:BYTE";
+				description "If non-zero, an indicator of an error.";
+			}
+			amp:result "data" {
+				type "amp:BLOB";
+				description "Encoded value of the object.";
+			}
+		}
+
+		amp:control "set" {
+			amp:suboid "3";
+			description "Set a single MIB value in the agent.";
+			
+			amp:parameter "corrid" {
+				type "amp:SDNV";
+				description "The correlation identifier for the request.";
+			}
+			amp:parameter "object" {
+				type "amp:MID";
+				description "Identify the value to retrieve.";
+			}
+			amp:parameter "data" {
+				type "amp:BLOB";
+				description "Encoded value used to write the object.";
+			}
+			
+			amp:result "corrid" {
+				type "amp:SDNV";
+				description "The correlation identifier for the response.";
+			}
+			amp:result "errorcode" {
+				type "amp:BYTE";
+				description "If non-zero, an indicator of an error.";
+			}
+		}
+	}
+	
+}

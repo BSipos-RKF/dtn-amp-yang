@@ -1,0 +1,20 @@
+module "amp-adm" {
+	namespace "urn:ietf:params:xml:ns:yang:draft-amp-adm";
+	prefix "amp";
+
+	include amp-types;
+	include amp-extensions;
+	include amp-instances;
+	
+	organization
+		"DTN-WG";
+	contact
+		"TBD";
+	description
+		"This module implements the Asynchornous Management Protocol "
+		+"Application Data Model (ADM) profile within YANG";
+	
+	revision "2016-03-02" {
+		description "Initial draft release.";
+	}
+}
