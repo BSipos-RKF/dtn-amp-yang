@@ -42,8 +42,8 @@
 
     <abstract><t>
       This document specifies a YANG profile for defining
-      Application Data Model (ADM) schema for the Asynchronous Management
-      Protocol (AMP).
+      Application Data Model (ADM) schema for the
+      Asynchronous Management Protocol (AMP).
       The AMP has no relation to NETCONF; YANG is used here only for
       its language syntax, and its module and type systems.
     </t></abstract>
@@ -57,6 +57,9 @@
       The fact that YANG is also used to specify data models for the
       NETCONF protocol has no direct influence over this use of YANG
       to specify data models for AMP.
+      </t>
+      <t>
+      
       </t>
 
       <section title="Requirements Language">
@@ -99,14 +102,25 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         contexts, so following the allowed substatement table is important.
         </t>
         <t>
-        Full OIDs can be used in any situation where an OID is needed.
-        Compressed OIDs can also be used in any situation where and OID is
-        needed, but require the use of a module-unique OID nickname ID.
-        Sub-OIDs can be used where the OID being assigned is relative to the
-        structural (module-statement-wise) parent of the assignment.
-        An ADM SHOULD make use of sub-OIDs where possible, both to avoid
-        typos possible with full OIDs and to avoid nickname assignment for
-        every group within the ADM.
+        The types of OID assignments are:
+          <list style="symbols">
+            <t>
+            Full OIDs can be used in any situation where an OID is needed.
+            </t>
+            <t>
+            Compressed OIDs can also be used in any situation where an OID is
+            needed, but require the use of a module-unique OID nickname ID.
+            </t>
+            <t>
+            Sub-OIDs can be used where the OID being assigned is relative to the
+            structural (module-statement-wise) parent of the assignment.
+            </t>
+          </list>
+          An ADM SHOULD make use of sub-OIDs where possible, both to avoid
+          typos possible with full OIDs and to avoid nickname assignment for
+          every group within the ADM.
+          Using sub-OIDs also guarantees that the tree structure of the ADM
+          module matches one-for-one with the OID tree.
         </t>
       </section>
     </section>
@@ -330,7 +344,7 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
           <c>1</c>
           <c>group</c>
           <c>0..*</c>
-          <c>dataitem</c>
+          <c>primitive</c>
           <c>0..*</c>
           <c>control</c>
           <c>0..*</c>
@@ -343,19 +357,19 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         </texttable>
       </section>
 
-      <section anchor="stmt.dataitem" title="The dataitem Extension Statement">
+      <section anchor="stmt.primitive" title="The primitive Extension Statement">
         <t>
-        The "dataitem" statement is used to define an atomic value within
+        The "primitive" statement is used to define an atomic value within
         an ADM.
-        Each dataitem is assigned an OID (see <xref target="oid-assign"/>)
+        Each primitive is assigned an OID (see <xref target="oid-assign"/>)
         and a type.
-        The dataitem has different semantics from the YANG "leaf" statement
+        The primitive has different semantics from the YANG "leaf" statement
         due to the lack of secondary (non-type) attributes (e.g. config/state
         distinction).
-        All dataitem objects are state; any configuration is performed
+        All primitive objects are state; any configuration is performed
         via "control" statements.
         </t>
-        <texttable anchor="stmt.dataitem.subs" title="dataitem Substatements">
+        <texttable anchor="stmt.primitive.subs" title="primitive Substatements">
           <ttcol>substatement</ttcol>
           <ttcol>cardinality</ttcol>
           
@@ -514,7 +528,7 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         of items.
         </t>
         <t>
-        A reportitem is an atomic value with a distinct OID of the dataitem
+        A reportitem is an atomic value with a distinct OID of the primitive
         to be included in a report instance.
         A reportitem has no type of its own.
         The reportitem statement's argument is used as the item's name.

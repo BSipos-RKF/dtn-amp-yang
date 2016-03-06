@@ -44,7 +44,7 @@ submodule "amp-extensions" {
 			"A logical grouping of ADM items under a parent OID.";
 	}
 	
-	extension "dataitem" {
+	extension "primitive" {
 		argument "name";
 		description "A single typed object associated with an OID.";
 	}
@@ -56,7 +56,7 @@ submodule "amp-extensions" {
 	extension "reportitem" {
 		argument "name";
 		description
-			"A reference to a dataitem within a report definition.";
+			"A reference to a primitive within a report definition.";
 	}
 	
 	extension "control" {

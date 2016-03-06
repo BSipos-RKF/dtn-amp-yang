@@ -31,7 +31,7 @@ class Ext(object):
 
 #: may can have absolute or structural OID
 any_oid_parents = [('amp:group', '?'),
-              ('amp:dataitem', '?'),
+              ('amp:primitive', '?'),
               ('amp:report', '?'),
               ('amp:control', '?')]
 #: must have absolute OID
@@ -50,9 +50,9 @@ MODULE_EXTENSIONS = (
     Ext('suboid', OID_TYPENAME, [], any_oid_parents),
     
     #: Structural items
-    Ext('group', 'string', ['amp:group', 'amp:dataitem'],
+    Ext('group', 'string', ['amp:group', 'amp:primitive'],
         [('module', '*')]),
-    Ext('dataitem', 'string', ['amp:group'],
+    Ext('primitive', 'string', ['amp:group'],
         [('amp:group', '*')]),
     Ext('report',  'string', ['amp:reportitem', 'amp:MC-instance'],
         [('amp:group', '*')]),
@@ -69,7 +69,7 @@ MODULE_EXTENSIONS = (
     Ext('MC-instance', None, ['amp:MID-instance'],
         [('amp:report', '?')]),
     Ext('MID-instance', None, ['amp:fulloid', 'amp:compressoid', 'instance-identifier'],
-        [('amp:group', '*'), ('amp:dataitem', '*')]),
+        [('amp:group', '*'), ('amp:primitive', '*')]),
 )
 
 PREFIX_REGEX = re.compile(r'{0}:(.*)'.format(MODULE_PREFIX))
