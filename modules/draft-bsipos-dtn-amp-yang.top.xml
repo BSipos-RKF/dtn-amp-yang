@@ -5,7 +5,6 @@
 <?rfc toc="yes"?>
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
      ipr="trust200902" 
-     docName="draft-bsipos-dtn-amp-yang"
      category="exp">
   <front>
     <title abbrev="A YANG profile for AMP ADMs">
@@ -38,7 +37,7 @@
       </address>
     </author>
     <date year="2016" month="March"/>
-    <workgroup>Internet Research Task Force (IRTF)</workgroup>
+    <workgroup>Delay Tolerant Networking</workgroup>
 
     <abstract><t>
       This document specifies a YANG profile for defining

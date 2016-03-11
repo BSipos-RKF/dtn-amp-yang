@@ -1,10 +1,16 @@
-draft-bsipos-dtn-amp-yang-mod.xml: include-and-strip.xsl draft-bsipos-dtn-amp-yang.xml *.yang
-	xsltproc --output draft-bsipos-dtn-amp-yang-mod.xml --xinclude include-and-strip.xsl draft-bsipos-dtn-amp-yang.xml
 
-draft-bsipos-dtn-amp-yang.txt: draft-bsipos-dtn-amp-yang-mod.xml
-	xml2rfc -o draft-bsipos-dtn-amp-yang.txt draft-bsipos-dtn-amp-yang-mod.xml
+%.xml: %.top.xml include-and-strip.xsl *.yang
+	xsltproc --output $@ --xinclude include-and-strip.xsl $<
 
-draft-bsipos-dtn-amp-yang.html: draft-bsipos-dtn-amp-yang-mod.xml
-	xml2rfc --html -o draft-bsipos-dtn-amp-yang.html draft-bsipos-dtn-amp-yang-mod.xml
+%.txt: %.xml
+	xml2rfc -o $@ $<
 
-all: draft-bsipos-dtn-amp-yang.html draft-bsipos-dtn-amp-yang.txt
+%.html: %.xml
+	xml2rfc --html -o $@ $<
+
+OUTFILES = draft-bsipos-dtn-amp-yang.html draft-bsipos-dtn-amp-yang.txt
+
+all: $(OUTFILES)
+
+clean:
+	rm $(OUTFILES)
