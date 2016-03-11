@@ -2,6 +2,7 @@
 DocBook "reference" tree containing detailed breakdown of the module contents.
 '''
 
+import sys
 import copy
 import logging
 import pyang.plugin
@@ -11,6 +12,7 @@ import pyang.statements
 #import pyang.plugins.tree
 import mako.template
 #import xml.etree.ElementTree as ET
+from amp_adm import MODULE_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +55,7 @@ MODULE_TEMPLATE = '''\
           MIB tree:
           <variablelist>
             %for sub_item in module.items:
-            ${toc_item_tmpl.render(item=sub_item, item_tmpl=toc_item_tmpl)}
+            ${toc_item_tmpl.render(item=sub_item, toc_item_tmpl=toc_item_tmpl)}
             %endfor
           </variablelist>
         </para>
@@ -61,7 +63,7 @@ MODULE_TEMPLATE = '''\
     <refsect1>
         <title>Detailed Descriptions</title>
         %for sub_item in module.items:
-        ${detail_item_tmpl.render(item=sub_item, item_tmpl=detail_item_tmpl)}
+        ${detail_item_tmpl.render(item=sub_item, detail_item_tmplb=detail_item_tmpl)}
         %endfor
     </refsect1>
 </refentry>
@@ -75,9 +77,9 @@ TOC_ITEM_TEMPLATE = '''\
     <simpara>
     ${item.summary |h}
     </simpara>
-    %if item.keyword in ('container', 'list', 'notification'):
+    %if item.keyword in ('container', ('amp-adm', 'group'), 'list', 'notification'):
     <para>
-      %if item.keyword == 'container':
+      %if item.keyword in ('container', ('amp-adm', 'group')):
       Group of items:
       %elif item.keyword == 'list':
       List of items:
@@ -86,7 +88,7 @@ TOC_ITEM_TEMPLATE = '''\
       %endif
       <variablelist>
           %for sub_item in item.items:
-          ${item_tmpl.render(item=sub_item, item_tmpl=item_tmpl)}
+          ${toc_item_tmpl.render(item=sub_item, toc_item_tmpl=toc_item_tmpl)}
           %endfor
       </variablelist>
     </para>
@@ -127,7 +129,7 @@ DETAIL_ITEM_TEMPLATE = '''\
         %endif
     %elif item.keyword == 'list':
         <varlistentry>
-            <term>Key leaf:</term>
+            <term>Key:</term>
             <listitem><systemitem>${item.key_name |h}</systemitem></listitem>
         </varlistentry>
         <varlistentry>
@@ -167,14 +169,28 @@ DETAIL_ITEM_TEMPLATE = '''\
 </refsect2>
 %if item.keyword in ('container', 'list', 'notification'):
 %for sub_item in item.items:
-${item_tmpl.render(item=sub_item, item_tmpl=item_tmpl)}
+${detail_item_tmplb.render(item=sub_item, detail_item_tmplb=detail_item_tmplb)}
 %endfor
 %endif
 '''
 
+AMP_TYPES = [
+    'amp:BYTE',
+    'amp:INT',
+    'amp:UINT',
+    'amp:VAST',
+    'amp:UVAST',
+    'amp:REAL32',
+    'amp:REAL64',
+    'amp:SDNV',
+    'amp:TS',
+    'amp:BLOB',
+]
+
 class Context(object):
-    
-    #class Scope
+    ''' Keep track of non-statement-specific data related to the
+    substatement tree within a module.
+    '''
     
     def __init__(self, module):
         self._prefix_map = {}
@@ -187,8 +203,7 @@ class Context(object):
         self._typedef_stack = []
         # The base scope are built-in types
         builtins = {}
-        for name in ('enumeration', 'binary', 'instance-identifier',
-                     'uint8', 'int8', 'uint32', 'int32', 'uint64', 'int64'):
+        for name in AMP_TYPES:
             builtins[name] = pyang.statements.Statement(None, None, None, 'type', name)
         self._typedef_stack.append(builtins)
     
@@ -213,7 +228,15 @@ class Context(object):
             raise ValueError('Unknown type "{0}"'.format(name))
     
     def walk_tree(self, origin, reducer):
+        ''' Walk a statement tree applying a specific reducer.
         
+        :param origin: The original statement to search from.
+        :param reducer: A function-like object which is called for 
+            the origin statement and all of its parent statements.
+            The reducer should raise StopIteration if it finishes
+            before the root of the statement hierarchy.
+        :return: The :py:obj:`reducer` after finishing the walk.
+        '''
         next_stmt = origin
         while next_stmt:
             try:
@@ -233,7 +256,9 @@ class Context(object):
             statement and each subsequent typedef statements in the type chain.
             The reducer is called with a single argument of the sub-statement
             object at each level (which may be None for some levels).
-        :return: A sub-statement matching the required name or None.
+            The reducer should raise StopIteration if it finishes
+            before the root of the subtype hierarchy.
+        :return: The :py:obj:`reducer` after finishing the walk.
         '''
         sub_stmt = origin.search_one(sub_name)
         next_type = origin.search_one('type')
@@ -272,19 +297,21 @@ class Descriptor(object):
         self.summary = self._trim_description(desc)
         self.description = arg_or_val(desc)
         logger.info('sub {0}'.format(', '.join([str(sub.keyword) for sub in stmt.substmts])))
-        self.oid = arg_or_val(stmt.search_one(('rkf-eng-dcb-mib', 'fulloid')))
+        self.oid = arg_or_val(stmt.search_one((MODULE_NAME, 'fulloid')))
         
         self.items = []
         ctx._scope_enter(stmt)
         
         # Extract non-expanded statements first
         for sub in stmt.substmts:
-            if sub.keyword not in ('typedef',):
+            #logger.info(sub.keyword)
+            if sub.keyword in ('container','list', 'leaf'):
                 continue
             try:
                 handler = Descriptor.HANDLER_CLASSES[sub.keyword]
             except KeyError:
                 handler = None
+            sys.stderr.write('key {0} handl \n'.format(sub.keyword, handler))
             
             if handler:
                 self.items.append(handler(ctx=ctx, stmt=sub))
@@ -296,6 +323,7 @@ class Descriptor(object):
                     handler = Descriptor.HANDLER_CLASSES[sub.keyword]
                 except KeyError:
                     handler = None
+                #sys.stderr.write('key {0} handl \n'.format(sub.keyword, handler))
                 
                 if handler:
                     self.items.append(handler(ctx=ctx, stmt=sub))
@@ -375,8 +403,22 @@ class Typedef(Descriptor):
             self.type_uid = self._path_uid(ctx._find_typedef(self.type_name))
         self.unit_name = arg_or_val(stmt.search_one('units'))
 
-@handler(('amp-adm', 'group'))
+@handler((MODULE_NAME, 'group'))
 class Group(Descriptor):
+    ''' Represent a container node in the module tree. '''
+    
+    def __init__(self, *args, **kwargs):
+        Descriptor.__init__(self, *args, **kwargs)
+
+@handler((MODULE_NAME, 'primitive'))
+class Primitive(Descriptor):
+    ''' Represent a container node in the module tree. '''
+    
+    def __init__(self, *args, **kwargs):
+        Descriptor.__init__(self, *args, **kwargs)
+
+@handler('container')
+class Container(Descriptor):
     ''' Represent a container node in the module tree. '''
     
     def __init__(self, *args, **kwargs):
@@ -466,6 +508,9 @@ class DocbookFormatter(pyang.plugin.PyangPlugin):
     def add_output_format(self, fmts):
         ''' Register this plugin's output formatters. '''
         fmts['docbook-reference'] = self
+    
+    def post_validate(self, ctx, modules):
+        return pyang.plugin.PyangPlugin.post_validate(self, ctx, modules)
     
     def emit(self, ctx, modules, outfile):
         mod_descriptors = []

@@ -46,7 +46,12 @@ submodule "amp-extensions" {
 	
 	extension "primitive" {
 		argument "name";
-		description "A single typed object associated with an OID.";
+		description "A single typed value associated with an OID.";
+	}
+	
+	extension "computed" {
+		argument "name";
+		description "A single typed value-expression associated with an OID.";
 	}
 	
 	extension "report" {

@@ -15,7 +15,11 @@ module "example-adm" {
 		amp:fulloid "1.3.6.1.2";
 	}
 	
-	amp:group "primitives" {
+	typedef "gauge-R32" {
+		type "amp:REAL32";
+	}
+	
+	container "primitives" {
 		amp:suboid "1";
 		description "Primitive data available for getting or setting";
 		
@@ -23,6 +27,28 @@ module "example-adm" {
 			amp:suboid "1";
 			type "amp:UVAST";
 			description "Example value.";
+		}
+		
+		list "listof" {
+			amp:suboid "1";
+			key "index";
+			
+			leaf "index" {
+				amp:suboid "0";
+				type "amp:INT";
+			}
+			leaf "val" {
+				type "gauge-R32";
+			}
+		}
+		
+		amp:computed "sum" {
+			type "amp:UVAST";
+			
+			amp:MID-instance {
+				//instance-identifier "/primitives/example";
+				amp:compressoid "";
+			}
 		}
 	}
 	
@@ -34,7 +60,8 @@ module "example-adm" {
 			
 			amp:MC-instance {
 				amp:MID-instance {
-//					instance-identifier "/primitives/example";
+					//instance-identifier "/primitives/example";
+					amp:compressoid "";
 				}
 			}
 		}
@@ -42,25 +69,19 @@ module "example-adm" {
 	
 	amp:group "controls" {
 		amp:suboid "4";
-		description "Container for all commands in this ADM.";
+		description
+			"Container for all commands in this ADM. "
+			+"The MID Tag is used as a correlator between parameters and results.";
 	
 		amp:control "get" {
 			amp:suboid "2";
 			description "Get a single MIB value from the agent.";
 			
-			amp:parameter "corrid" {
-				type "amp:SDNV";
-				description "The correlation identifier for the request.";
-			}
 			amp:parameter "object" {
 				type "amp:MID";
 				description "Identity of the object to retrieve.";
 			}
 			
-			amp:result "corrid" {
-				type "amp:SDNV";
-				description "The correlation identifier for the response.";
-			}
 			amp:result "errorcode" {
 				type "amp:BYTE";
 				description "If non-zero, an indicator of an error.";

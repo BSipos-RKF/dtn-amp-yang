@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 #: Extension module name to hook onto
-MODULE_NAME = 'adm-amp'
+MODULE_NAME = 'amp-adm'
 MODULE_PREFIX = 'amp'
 
 #: Internal type name for OID checking
@@ -23,62 +23,104 @@ class Ext(object):
     :param subs: sub-statement keywords
     :param parents: Tuple of: parent-statement keywords, and occurrence flags
     '''
-    def __init__(self, keyword, typename, subs, parents):
+    def __init__(self, keyword, typename, subs=None, parents=None, **kwargs):
         self.keyword = keyword
         self.typename = typename
+        if subs is None:
+            subs = []
         self.subs = subs
+        if parents is None:
+            parents = []
         self.parents = parents
+        self.has_description = True
+        for (key,val) in kwargs.iteritems():
+            setattr(self, key, val)
 
 #: may can have absolute or structural OID
-any_oid_parents = [('amp:group', '?'),
-              ('amp:primitive', '?'),
-              ('amp:report', '?'),
-              ('amp:control', '?')]
-#: must have absolute OID
-abs_oid_parents = [('amp:MID-instance', '1')]
+any_oid_parents = [((MODULE_NAME, 'group'), '?'),
+                   ((MODULE_NAME, 'primitive'), '?'),
+                   ((MODULE_NAME, 'report'), '?'),
+                   ((MODULE_NAME, 'control'), '?'),
+                   ('container', '?'),
+                   ('list', '?'),
+                   ('leaf', '?')]
 #: List of extension statements defined by the module
 MODULE_EXTENSIONS = (
     # Internals
-    Ext('amp-type-id', 'uint8', [], [('typedef', '?')]),
-    Ext('amp-type-item', 'string', [], [('typedef', '*')]),
-    Ext('amp-type-list', 'string', [], [('typedef', '*')]),
+    Ext('amp-type-id', 'uint8', [], parents=[('typedef', '?')]),
+    Ext('amp-type-item', 'string', [], parents=[('typedef', '*')]),
+    Ext('amp-type-list', 'string', [], parents=[('typedef', '*')]),
     
     #: OID assignment
-    Ext('nickname', 'uint8', [], [('module', '*')]),
-    Ext('compressoid', OID_TYPENAME, [], any_oid_parents + abs_oid_parents),
-    Ext('fulloid', OID_TYPENAME, [], any_oid_parents + abs_oid_parents),
-    Ext('suboid', OID_TYPENAME, [], any_oid_parents),
+    Ext('nickname', 'uint8',
+        subs=[((MODULE_NAME, 'fulloid'), '1')],
+        parents=[('module', '*')]),
+    Ext('compressoid', OID_TYPENAME, [], 
+        parents=(any_oid_parents)),
+    Ext('fulloid', OID_TYPENAME, [],
+        parents=(any_oid_parents + [('module', '?')])),
+    Ext('suboid', OID_TYPENAME, [],
+        parents=any_oid_parents),
     
     #: Structural items
-    Ext('group', 'string', ['amp:group', 'amp:primitive'],
-        [('module', '*')]),
-    Ext('primitive', 'string', ['amp:group'],
-        [('amp:group', '*')]),
-    Ext('report',  'string', ['amp:reportitem', 'amp:MC-instance'],
-        [('amp:group', '*')]),
-    Ext('reportitem',  'string', ['amp:MID-instance'],
-        [('amp:report', '+')]),
-    Ext('control',  'string', ['amp:parameter', 'amp:result'],
-        [('amp:group', '*')]),
-    Ext('parameter',  'string', ['type'],
-        [('amp:report', '*')]),
-    Ext('result',  'string', ['type'],
-        [('amp:report', '*')]),
+    Ext('group', 'string',
+        subs=[((MODULE_NAME, 'group'), '*'),
+              ('list', '*')],
+        parents=[('module', '*')]),
+    
+    Ext('primitive', 'string',
+        subs=[('type', '1')],
+        parents=[('container', '*'),
+                 ((MODULE_NAME, 'group'), '*')]),
+    Ext('computed', 'string',
+        subs=[('type', '1')],
+        parents=[('container', '*'),
+                 ((MODULE_NAME, 'group'), '*')]),
+    
+    Ext('report', 'string',
+        subs=[((MODULE_NAME, 'reportitem'), '*'),
+              ((MODULE_NAME, 'MC-instance'), '?')],
+        parents=[((MODULE_NAME, 'group'), '*')]),
+    Ext('reportitem', 'string',
+        subs=[(MODULE_NAME, 'MID-instance')]),
+    
+    Ext('control', 'string',
+        subs=[((MODULE_NAME, 'parameter'), '*'),
+              ((MODULE_NAME, 'result'), '*')],
+        parents=[((MODULE_NAME, 'group'), '*')]),
+    Ext('parameter', 'string',
+        subs=[('type', '1')]),
+    Ext('result', 'string',
+        subs=[('type', '1')]),
     
     #: Instance items
-    Ext('MC-instance', None, ['amp:MID-instance'],
-        [('amp:report', '?')]),
-    Ext('MID-instance', None, ['amp:fulloid', 'amp:compressoid', 'instance-identifier'],
-        [('amp:group', '*'), ('amp:primitive', '*')]),
+    Ext('instance-text', 'string'),
+    Ext('primitive-instance', None,
+        subs=[('type', '1'),
+              ((MODULE_NAME, 'instance-text'), '?')]),
+    Ext('issuer-instance', 'sdnv'),
+    Ext('tag-instance', 'sdnv'),
+    
+    Ext('MID-instance', None,
+        subs=[((MODULE_NAME, 'fulloid'), '?'),
+              ((MODULE_NAME, 'compressoid'), '?'),
+              ('instance-identifier', '?'),
+              ((MODULE_NAME, 'primitive-instance'), '?')],
+        parents=[((MODULE_NAME, 'group'), '*'),
+                 ((MODULE_NAME, 'primitive'), '*'),
+                 ((MODULE_NAME, 'computed'), '*')]),
+    Ext('MC-instance', None,
+        subs=[((MODULE_NAME, 'MID-instance'), '*')],
+        parents=[((MODULE_NAME, 'report'), '?')]),
 )
 
-PREFIX_REGEX = re.compile(r'{0}:(.*)'.format(MODULE_PREFIX))
-def delprefix(name):
-    ''' Remove this module's prefix from names. '''
-    match = PREFIX_REGEX.match(name)
-    if match is None:
-        return name
-    return (MODULE_NAME, match.group(1))
+def check_uint8(val):
+    ''' Verify numeric statement argument. '''
+    try:
+        val = int(val)
+        return (val >= 0 and val <= 255)
+    except TypeError:
+        return False
 
 def check_oid(val):
     ''' Verify the contents of OID text. '''
@@ -125,19 +167,20 @@ def pyang_plugin_init():
     
     # Register that we handle extensions from the associated YANG module
     pyang.grammar.register_extension_module(MODULE_NAME)
+    pyang.syntax.add_arg_type('uint8', check_uint8)
     pyang.syntax.add_arg_type(OID_TYPENAME, check_oid)
     
-    # These are missing from pyang
-    #pyang.grammar.add_stmt('default', ('string', []))
-    pyang.grammar.add_stmt('instance-identifier', ('string', []))
-    
     for ext in MODULE_EXTENSIONS:
-        sub_stmts = [delprefix(name) for name in ext.subs]
+        sub_stmts = ext.subs
         #print ext.keyword, ext.typename, sub_stmts
         pyang.grammar.add_stmt((MODULE_NAME, ext.keyword), (ext.typename, sub_stmts))
     for ext in MODULE_EXTENSIONS:
         for (name, occurr) in ext.parents:
-            pyang.grammar.add_to_stmts_rules([delprefix(name)], [((MODULE_NAME, ext.keyword), occurr)])
+            pyang.grammar.add_to_stmts_rules([name], [((MODULE_NAME, ext.keyword), occurr)])
+        
+        # Standard substatements
+        if ext.has_description:
+            pyang.grammar.add_to_stmts_rules([(MODULE_NAME, ext.keyword)], [('description', '?')])
     
     # Add validation step
     pyang.statements.add_validation_phase('set_oid', after='inherit_properties')

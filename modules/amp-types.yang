@@ -177,7 +177,8 @@ submodule "amp-types" {
 		amp:amp-type-item "id" { type "MID"; }
 		amp:amp-type-item "start" { type "TS"; }
 		// Mismatch in AMP spec for PRED type
-		amp:amp-type-item "condition" { type "PRED"; }
+//		amp:amp-type-item "condition" { type "PRED"; }
+		amp:amp-type-item "condition" { type "EXPR"; }
 		amp:amp-type-item "count" { type "SDNV"; }
 		amp:amp-type-item "action" { type "MC"; }
 	}
