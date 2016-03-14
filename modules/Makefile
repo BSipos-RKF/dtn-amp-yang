@@ -8,7 +8,10 @@
 %.html: %.xml
 	xml2rfc --html -o $@ $<
 
-OUTFILES = draft-bsipos-dtn-amp-yang.html draft-bsipos-dtn-amp-yang.txt
+OUTFILES = \
+	draft-bsipos-dtn-amp-yang.xml \
+	draft-bsipos-dtn-amp-yang.html \
+	draft-bsipos-dtn-amp-yang.txt
 
 all: $(OUTFILES)
 

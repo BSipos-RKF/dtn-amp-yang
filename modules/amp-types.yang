@@ -3,10 +3,6 @@ submodule "amp-types" {
 		prefix "amp";
 	}
 	
-	organization
-		"TBD";
-	contact
-		"TBD";
 	description
 		"This submodule contains the set of core types necessary to "
 		+"define an Asynchronous Management Protocol data model.";

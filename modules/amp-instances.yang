@@ -3,10 +3,6 @@ submodule "amp-instances" {
 		prefix "amp";
 	}
 	
-	organization
-		"TBD";
-	contact
-		"TBD";
 	description
 		"This submodule contains the extensions necessary to "
 		+"define AMP data instances directly in an ADM.";

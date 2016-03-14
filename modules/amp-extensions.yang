@@ -3,10 +3,6 @@ submodule "amp-extensions" {
 		prefix "amp";
 	}
 	
-	organization
-		"TBD";
-	contact
-		"TBD";
 	description
 		"This submodule contains the set of core extensions necessary to "
 		+"define an Asynchronous Management Protocol data model.";

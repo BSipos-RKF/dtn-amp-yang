@@ -1,20 +1,32 @@
 module "amp-adm" {
 	namespace "urn:ietf:params:xml:ns:yang:draft-amp-adm";
 	prefix "amp";
-
+	
 	include amp-types;
 	include amp-extensions;
 	include amp-instances;
 	
 	organization
-		"DTN-WG";
+		"IETF Delay Tolerant Networking Working Group";
 	contact
-		"TBD";
+		"WG Web: <http://tools.ietf.org/wg/dtn/>
+        WG List: <mailto:dtn@ietf.org>
+
+        WG Chairs: Brian Haberman
+                   <mailto:brian@innovationslab.net>
+                   Marc Blanchet
+                   <mailto:Marc.Blanchet@viagenie.ca>
+
+        Editor: Brian Sipos
+                <mailto:BSIpos@rkf-eng.com>";
+	
 	description
-		"This module implements the Asynchornous Management Protocol "
+		"This module implements the "
+		+"Asynchornous Management Protocol (AMP) "
 		+"Application Data Model (ADM) profile within YANG";
 	
-	revision "2016-03-02" {
+	revision "2016-03-14" {
 		description "Initial draft release.";
+		reference "I-D draft-bsipos-dtn-amp-yang";
 	}
 }
