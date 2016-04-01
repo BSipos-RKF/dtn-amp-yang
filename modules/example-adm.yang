@@ -1,8 +1,8 @@
-module "example-adm" {
+module example-adm {
 	namespace "urn:example-adm";
 	prefix "example-adm";
 	
-	import "amp-adm" {
+	import amp-adm {
 		prefix "amp";
 	}
 	

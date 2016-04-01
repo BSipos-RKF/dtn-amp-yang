@@ -1,5 +1,5 @@
-module "amp-adm" {
-	namespace "urn:ietf:params:xml:ns:yang:draft-amp-adm";
+module amp-adm {
+	namespace "urn:ietf:params:xml:ns:yang:amp-adm";
 	prefix "amp";
 	
 	include amp-types;
@@ -24,9 +24,14 @@ module "amp-adm" {
 		"This module implements the "
 		+"Asynchornous Management Protocol (AMP) "
 		+"Application Data Model (ADM) profile within YANG";
+    reference "draft Asynchronous Management Protocol";
 	
 	revision "2016-03-14" {
 		description "Initial draft release.";
 		reference "I-D draft-bsipos-dtn-amp-yang";
 	}
+    revision "2016-04-01" {
+        description "Updated to fix typos.";
+        reference "I-D draft-bsipos-dtn-amp-yang";
+    }
 }

@@ -1,13 +1,36 @@
-submodule "amp-types" {
-	belongs-to "amp-adm" {
+submodule amp-types {
+	belongs-to amp-adm {
 		prefix "amp";
 	}
 	
+    organization
+        "IETF Delay Tolerant Networking Working Group";
+    contact
+        "WG Web: <http://tools.ietf.org/wg/dtn/>
+        WG List: <mailto:dtn@ietf.org>
+
+        WG Chairs: Brian Haberman
+                   <mailto:brian@innovationslab.net>
+                   Marc Blanchet
+                   <mailto:Marc.Blanchet@viagenie.ca>
+
+        Editor: Brian Sipos
+                <mailto:BSIpos@rkf-eng.com>";
+    
 	description
 		"This submodule contains the set of core types necessary to "
 		+"define an Asynchronous Management Protocol data model.";
 	reference "draft Asynchronous Management Protocol";
 	
+    revision "2016-03-14" {
+        description "Initial draft release.";
+        reference "I-D draft-bsipos-dtn-amp-yang";
+    }
+    revision "2016-04-01" {
+        description "Updated to fix typos.";
+        reference "I-D draft-bsipos-dtn-amp-yang";
+    }
+    
 	// These extensions are only used within this submodule for annotation
 	extension amp-type-id {
 		argument "num";

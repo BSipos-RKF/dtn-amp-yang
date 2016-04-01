@@ -1,13 +1,36 @@
-submodule "amp-instances" {
-	belongs-to "amp-adm" {
+submodule amp-instances {
+	belongs-to amp-adm {
 		prefix "amp";
 	}
 	
+    organization
+        "IETF Delay Tolerant Networking Working Group";
+    contact
+        "WG Web: <http://tools.ietf.org/wg/dtn/>
+        WG List: <mailto:dtn@ietf.org>
+
+        WG Chairs: Brian Haberman
+                   <mailto:brian@innovationslab.net>
+                   Marc Blanchet
+                   <mailto:Marc.Blanchet@viagenie.ca>
+
+        Editor: Brian Sipos
+                <mailto:BSIpos@rkf-eng.com>";
+    
 	description
 		"This submodule contains the extensions necessary to "
 		+"define AMP data instances directly in an ADM.";
 	reference "draft Asynchronous Management Protocol";
 	
+    revision "2016-03-14" {
+        description "Initial draft release.";
+        reference "I-D draft-bsipos-dtn-amp-yang";
+    }
+    revision "2016-04-01" {
+        description "Updated to fix typos.";
+        reference "I-D draft-bsipos-dtn-amp-yang";
+    }
+    
 	extension number-instance {
 		argument "value";
 		description

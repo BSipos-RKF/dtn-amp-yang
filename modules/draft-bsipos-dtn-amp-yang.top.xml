@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
-  <!ENTITY AMPMODNAME "amp">
-]>
 <?rfc toc="yes"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+  <!ENTITY AMPMODNAME "amp-adm">
+]>
 <rfc xmlns:xi="http://www.w3.org/2001/XInclude"
      ipr="trust200902" 
-     category="exp">
+     category="exp"
+     docName="draft-bsipos-dtn-amp-yang">
   <front>
     <title abbrev="A YANG profile for AMP ADMs">
       A YANG profile for defining
@@ -873,10 +874,41 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
 
     <section title="IANA Considerations">
       <t>
-      This memo requires the use of a YANG module namespace.
-      This draft defines the "urn:ietf:params:xml:ns:yang:draft-amp-adm"
-      namespace only for the purpose of a placeholder.
+        This document registers one URI in the IETF 
+        XML registry <xref target="RFC3688"/>.
+        NOTE TO EDITOR: module registration is pending I-D approval.
+        The following registration has been made:
       </t>
+      <texttable>
+        <ttcol>Field</ttcol>
+        <ttcol>Value</ttcol>
+        
+        <c>URI</c>
+        <c>urn:ietf:params:xml:ns:yang:amp-adm</c>
+        <c>Registrant Contact</c>
+        <c>The DTN WG of the IETF.</c>
+        <c>XML</c>
+        <c>N/A, the requested URI is an XML namespace.</c>
+      </texttable>
+      <t>
+        This document registers one module name/namespace in the IETF
+        YANG Module Names Registry <xref target="RFC6020"/>.
+        NOTE TO EDITOR: module registration is pending I-D approval.
+        The following registration has been made:
+      </t>
+      <texttable>
+        <ttcol>Field</ttcol>
+        <ttcol>Value</ttcol>
+        
+        <c>Name</c>
+        <c>amp-adm</c>
+        <c>Namespace</c>
+        <c>urn:ietf:params:xml:ns:yang:amp-adm</c>
+        <c>Prefix</c>
+        <c>amp</c>
+        <c>Reference</c>
+        <c>draft-bsipos-dtn-amp-yang</c>
+      </texttable>
     </section>
 
     <section title="Security Considerations">
@@ -896,6 +928,7 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
       <?rfc include="reference.RFC.3339.xml"?>
       <?rfc include="reference.RFC.3548.xml"?>
       <?rfc include="reference.RFC.3629.xml"?>
+      <?rfc include="reference.RFC.3688.xml"?>
       <?rfc include="reference.RFC.6020.xml"?>
       <?rfc include="reference.RFC.6087.xml"?>
       <?rfc include="reference.I-D.birrane-dtn-amp.xml"?>
@@ -944,7 +977,6 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         </t>
         <figure>
         <artwork>&lt;CODE BEGINS&gt; file "amp-types.yang"
-
 <xi:include parse="text" href="amp-types.yang" />
 &lt;CODE ENDS&gt;</artwork>
         </figure>
@@ -956,7 +988,6 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         </t>
         <figure>
         <artwork>&lt;CODE BEGINS&gt; file "amp-extensions.yang"
-
 <xi:include parse="text" href="amp-extensions.yang" />
 &lt;CODE ENDS&gt;</artwork>
         </figure>
@@ -969,7 +1000,6 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
         </t>
         <figure>
         <artwork>&lt;CODE BEGINS&gt; file "amp-instances.yang"
-
 <xi:include parse="text" href="amp-instances.yang" />
 &lt;CODE ENDS&gt;</artwork>
         </figure>
@@ -982,10 +1012,9 @@ document are to be interpreted as described in <xref target="RFC2119"/>.
       The following YANG definition includes extensions specific to AMP.
       </t>
       <figure>
-      <artwork>&lt;CODE BEGINS&gt; file ""example-adm.yang""
-
+      <artwork>
 <xi:include parse="text" href="example-adm.yang" />
-&lt;CODE ENDS&gt;</artwork>
+</artwork>
       </figure>
     </section>
   </back>
